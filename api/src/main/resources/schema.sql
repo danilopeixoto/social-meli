@@ -10,11 +10,11 @@ create table if not exists Follower (
   follower_id integer not null,
   followed_id integer not null,
   constraint follower_pk_constraint primary key (follower_id, followed_id),
-  constraint follower_follower_id_account_id_fk_constraint
+  constraint follower_id_fk_constraint
     foreign key (follower_id)
     references Account (id)
     on delete cascade,
-  constraint follower_followed_id_account_id_fk_constraint
+  constraint followed_id_fk_constraint
     foreign key (followed_id)
     references Account (id)
     on delete cascade
@@ -22,10 +22,15 @@ create table if not exists Follower (
 
 create table if not exists Product (
   id serial,
+  account_id integer not null,
   type text not null,
   brand text not null,
   description text not null,
-  constraint product_pk_constraint primary key (id)
+  constraint product_pk_constraint primary key (id),
+  constraint account_id_fk_constraint
+    foreign key (account_id)
+    references Account (id)
+    on delete cascade
 );
 
 create table if not exists Post (
@@ -37,7 +42,15 @@ create table if not exists Post (
   price double precision not null,
   discount double precision not null,
   created_at timestamp not null,
-  constraint post_pk_constraint primary key (id)
+  constraint post_pk_constraint primary key (id),
+  constraint account_id_fk_constraint
+    foreign key (account_id)
+    references Account (id)
+    on delete cascade,
+  constraint product_id_fk_constraint
+    foreign key (product_id)
+    references Product (id)
+    on delete restrict
 );
 
 create index if not exists account_username_index on Account (username);
