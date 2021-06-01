@@ -12,14 +12,14 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class AccountFollowedResponse {
+public class PostCollectionResponseModel {
   @Valid
   @NotNull(message = "The account field is required.")
   @JsonProperty("account")
   private AccountModel account;
 
   @Valid
-  @NotNull(message = "The followed field is required.")
-  @JsonProperty("followed")
-  private List<AccountModel> followed;
+  @NotNull(message = "The posts field is required.")
+  @JsonProperty("posts")
+  private List<PostResponseModel> posts;
 }

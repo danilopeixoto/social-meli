@@ -23,8 +23,10 @@ create table if not exists Follower (
 create table if not exists Product (
   id serial,
   account_id integer not null,
+  name text not null,
   type text not null,
   brand text not null,
+  color text not null,
   description text not null,
   constraint product_pk_constraint primary key (id),
   constraint account_id_fk_constraint

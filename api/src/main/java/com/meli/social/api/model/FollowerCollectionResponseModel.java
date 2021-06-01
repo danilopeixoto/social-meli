@@ -6,20 +6,21 @@ import lombok.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class AccountCountResponse {
+public class FollowerCollectionResponseModel {
   @Valid
   @NotNull(message = "The account field is required.")
   @JsonProperty("account")
   private AccountModel account;
 
-  @NotNull(message = "The count field is required.")
-  @Min(value = 0, message = "The count field requires a positive integer.")
-  @JsonProperty("count")
-  private Integer count;
+  @Valid
+  @NotNull(message = "The users field is required.")
+  @JsonProperty("users")
+  private List<AccountModel> users;
 }

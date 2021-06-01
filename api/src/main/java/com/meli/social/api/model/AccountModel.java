@@ -2,6 +2,7 @@ package com.meli.social.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -20,6 +21,7 @@ public class AccountModel {
   @Min(value = 0, message = "The ID field requires a positive integer identifier.")
   @JsonProperty("id")
   @Column("id")
+  @Id
   private Integer id;
 
   @NotBlank(message = "The username field is required.")

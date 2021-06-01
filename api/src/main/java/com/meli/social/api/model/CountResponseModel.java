@@ -4,22 +4,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class AccountFollowerResponse {
+public class CountResponseModel {
   @Valid
   @NotNull(message = "The account field is required.")
   @JsonProperty("account")
   private AccountModel account;
 
-  @Valid
-  @NotNull(message = "The followers field is required.")
-  @JsonProperty("followers")
-  private List<AccountModel> followers;
+  @NotNull(message = "The count field is required.")
+  @Min(value = 0, message = "The count field requires a positive integer.")
+  @JsonProperty("count")
+  private Integer count;
 }
