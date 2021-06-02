@@ -2,6 +2,8 @@
 
 Mercado Libre social network.
 
+Social Meli democratizes the marketplace and users can safely advertise or buy items.
+
 ## Prerequisites
 
 * [Docker Engine (>=19.03.10)](https://docs.docker.com/engine)

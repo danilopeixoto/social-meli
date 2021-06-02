@@ -12,8 +12,8 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ErrorResponseModel {
-  @NotBlank(message = "The message field is required.")
-  @JsonProperty("message")
-  private String message;
+public class AccountRequestModel {
+  @NotBlank(message = "The username field is required.")
+  @JsonProperty("username")
+  private String username;
 }

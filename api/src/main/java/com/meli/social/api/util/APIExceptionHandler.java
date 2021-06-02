@@ -1,6 +1,7 @@
 package com.meli.social.api.util;
 
 import com.meli.social.api.model.ErrorResponseModel;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,8 +14,11 @@ import java.util.Objects;
 
 @RestControllerAdvice
 public class APIExceptionHandler {
-  @ExceptionHandler(ServerWebInputException.class)
-  public ResponseEntity<ErrorResponseModel> handleBadRequest(ServerWebInputException exception) {
+  @ExceptionHandler({
+    IllegalArgumentException.class,
+    ServerWebInputException.class
+  })
+  public ResponseEntity<ErrorResponseModel> handleBadRequest(Exception exception) {
     return ResponseEntity
       .status(HttpStatus.BAD_REQUEST)
       .body(new ErrorResponseModel(
@@ -27,16 +31,26 @@ public class APIExceptionHandler {
   }
 
   @ExceptionHandler(NoSuchElementException.class)
-  public ResponseEntity<ErrorResponseModel> handleNotFound(NoSuchElementException exception) {
+  public ResponseEntity<ErrorResponseModel> handleNotFound(Exception exception) {
     return ResponseEntity
       .status(HttpStatus.NOT_FOUND)
-      .body(new ErrorResponseModel("Resource not found."));
+      .body(new ErrorResponseModel(exception.getMessage()));
+  }
+
+  @ExceptionHandler({
+    DuplicateKeyException.class,
+    IllegalAccessException.class
+  })
+  public ResponseEntity<ErrorResponseModel> handleConflict(Exception exception) {
+    return ResponseEntity
+      .status(HttpStatus.CONFLICT)
+      .body(new ErrorResponseModel(exception.getMessage()));
   }
 
   @ExceptionHandler(RuntimeException.class)
-  public ResponseEntity<ErrorResponseModel> handleInternalServerError(RuntimeException exception) {
+  public ResponseEntity<ErrorResponseModel> handleInternalServerError(Exception exception) {
     return ResponseEntity
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .body(new ErrorResponseModel("Internal server error."));
+      .body(new ErrorResponseModel(exception.getClass().getName()));
   }
 }

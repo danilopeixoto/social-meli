@@ -1,7 +1,10 @@
 package com.meli.social.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -14,9 +17,8 @@ import java.time.Instant;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@Table("Post")
+@Data
+@Table("post")
 public class PostModel {
   @NotNull(message = "The ID field is required.")
   @Min(value = 0, message = "The ID field requires a positive integer identifier.")

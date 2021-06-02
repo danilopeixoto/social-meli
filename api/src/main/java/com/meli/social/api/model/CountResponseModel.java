@@ -1,7 +1,10 @@
 package com.meli.social.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -10,8 +13,7 @@ import javax.validation.constraints.NotNull;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
 public class CountResponseModel {
   @Valid
   @NotNull(message = "The account field is required.")

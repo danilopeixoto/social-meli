@@ -1,8 +1,10 @@
 package com.meli.social.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
-import org.springframework.data.relational.core.mapping.Column;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -11,13 +13,17 @@ import javax.validation.constraints.NotNull;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
 public class PostResponseModel {
   @NotNull(message = "The ID field is required.")
   @Min(value = 0, message = "The ID field requires a positive integer identifier.")
   @JsonProperty("id")
   private Integer id;
+
+  @NotNull(message = "The account ID field is required.")
+  @Min(value = 0, message = "The account ID field requires a positive integer identifier.")
+  @JsonProperty("account_id")
+  private Integer accountId;
 
   @NotNull(message = "The category field is required.")
   @Min(value = 0, message = "The category field requires a positive integer identifier.")
