@@ -6,6 +6,8 @@ import com.meli.social.api.repository.ProductRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Pageable;
+import org.springframework.r2dbc.BadSqlGrammarException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -36,12 +38,21 @@ public class ProductService {
     return this.repository.findById(id);
   }
 
-  public Flux<ProductModel> findByName(String name) {
-    return this.repository.findByName(name);
+  public Flux<ProductModel> findByName(String name, Pageable pageable) {
+    return this.repository
+      .findByName(name)
+      .skip(pageable.getOffset())
+      .take(pageable.getPageSize());
   }
 
-  public Flux<ProductModel> list() {
-    return this.repository.findAll();
+  public Flux<ProductModel> list(Pageable pageable) {
+    return this.repository
+      .findAll(pageable.getSort())
+      .onErrorMap(
+        BadSqlGrammarException.class,
+        (exception) -> new IllegalArgumentException("Invalid sort parameter."))
+      .skip(pageable.getOffset())
+      .take(pageable.getPageSize());
   }
 
   public Mono<ProductModel> update(Integer id, Mono<ProductRequestModel> productRequest) {
@@ -67,6 +78,10 @@ public class ProductService {
         .thenReturn(account))
       .onErrorMap(
         DataIntegrityViolationException.class,
-        (exception) -> new IllegalAccessException("Product attached to post."));
+        (exception) -> new IllegalStateException("Product attached to post."));
+  }
+
+  public Mono<Boolean> exists(Integer id) {
+    return this.repository.existsById(id);
   }
 }

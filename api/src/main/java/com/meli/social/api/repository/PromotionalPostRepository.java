@@ -1,6 +1,6 @@
 package com.meli.social.api.repository;
 
-import com.meli.social.api.model.AccountModel;
+import com.meli.social.api.model.PostModel;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -9,26 +9,23 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 @Repository
-public class FollowerRepository {
+public class PromotionalPostRepository {
   @Autowired
   private DatabaseClient databaseClient;
 
   @Autowired
   private ModelMapper queryModelMapper;
 
-  public Flux<AccountModel> findByAccountId(Integer accountId, Sort sort) {
+  public Flux<PostModel> findByAccountId(Integer accountId, Sort sort) {
     String sortString = sort
       .toString()
       .replace(":", "");
 
     return databaseClient
-      .sql(
-        "select a.* from account a " +
-          "inner join following f on f.follower_id = a.id and f.followed_id = $1 " +
-          "order by a." + sortString)
+      .sql("select * from post where account_id = $1 and promotional order by " + sortString)
       .bind("$1", accountId)
       .fetch()
       .all()
-      .map(results -> queryModelMapper.map(results, AccountModel.class));
+      .map(results -> queryModelMapper.map(results, PostModel.class));
   }
 }

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -15,8 +16,15 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Table("follower")
-public class FollowerModel {
+@Table("following")
+public class FollowingModel {
+  @NotNull(message = "The ID field is required.")
+  @Min(value = 0, message = "The ID field requires a positive integer identifier.")
+  @JsonProperty("id")
+  @Column("id")
+  @Id
+  private Integer id;
+
   @NotNull(message = "The follower ID field is required.")
   @Min(value = 0, message = "The follower ID field requires a positive integer identifier.")
   @JsonProperty("follower_id")

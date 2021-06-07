@@ -45,10 +45,10 @@ public class PostModel {
   @Column("category")
   private Integer category;
 
-  @NotNull(message = "The promotion field is required.")
-  @JsonProperty("promotion")
-  @Column("promotion")
-  private Boolean promotion;
+  @NotNull(message = "The promotional field is required.")
+  @JsonProperty("promotional")
+  @Column("promotional")
+  private Boolean promotional;
 
   @NotNull(message = "The price field is required.")
   @Min(value = 0, message = "The price field requires a positive number.")

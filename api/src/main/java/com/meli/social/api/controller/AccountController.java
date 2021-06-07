@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -19,7 +21,7 @@ import reactor.core.publisher.Mono;
 import javax.validation.Valid;
 import java.util.NoSuchElementException;
 
-@Tag(name = "Account service")
+@Tag(name = "Accounts")
 @Validated
 @RequestMapping("/accounts")
 @RestController
@@ -97,15 +99,18 @@ public class AccountController {
   })
   @GetMapping("/")
   public Flux<AccountModel> listOrFindByUsername(
-    @Valid @RequestParam(value = "username", required = false) String username) {
+    @Valid @RequestParam(value = "username", required = false) String username,
+    @Valid @RequestParam(value = "sort", defaultValue = "id") String sort,
+    @Valid @RequestParam(value = "order", defaultValue = "ASC") Sort.Direction order,
+    @Valid @RequestParam(value = "page", defaultValue = "0") Integer page,
+    @Valid @RequestParam(value = "size", defaultValue = "100") Integer size) {
     return Mono
       .justOrEmpty(username)
-      .flux()
       .switchIfEmpty(Mono.error(new IllegalArgumentException()))
-      .flatMap(this.service::findByUsername)
+      .flatMapMany(this.service::findByUsername)
       .onErrorResume(
         IllegalArgumentException.class,
-        exception -> this.service.list());
+        exception -> this.service.list(PageRequest.of(page, size, order, sort)));
   }
 
   @Operation(summary = "Update account by ID", responses = {

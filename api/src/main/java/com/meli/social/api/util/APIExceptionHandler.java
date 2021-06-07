@@ -27,7 +27,16 @@ public class APIExceptionHandler {
             ((WebExchangeBindException) exception)
               .getFieldError())
             .getDefaultMessage() :
-          "Bad request."));
+          exception.getMessage()));
+  }
+
+  @ExceptionHandler({
+    IllegalAccessException.class
+  })
+  public ResponseEntity<ErrorResponseModel> handleUnauthorized(Exception exception) {
+    return ResponseEntity
+      .status(HttpStatus.UNAUTHORIZED)
+      .body(new ErrorResponseModel(exception.getMessage()));
   }
 
   @ExceptionHandler(NoSuchElementException.class)
@@ -39,7 +48,7 @@ public class APIExceptionHandler {
 
   @ExceptionHandler({
     DuplicateKeyException.class,
-    IllegalAccessException.class
+    IllegalStateException.class
   })
   public ResponseEntity<ErrorResponseModel> handleConflict(Exception exception) {
     return ResponseEntity
@@ -51,6 +60,6 @@ public class APIExceptionHandler {
   public ResponseEntity<ErrorResponseModel> handleInternalServerError(Exception exception) {
     return ResponseEntity
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .body(new ErrorResponseModel(exception.getClass().getName()));
+      .body(new ErrorResponseModel("Internal server error."));
   }
 }

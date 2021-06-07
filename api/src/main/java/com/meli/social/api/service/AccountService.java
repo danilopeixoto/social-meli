@@ -7,6 +7,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Pageable;
+import org.springframework.r2dbc.BadSqlGrammarException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,7 +23,11 @@ public class AccountService {
 
   public Mono<AccountModel> create(Mono<AccountRequestModel> accountRequest) {
     return accountRequest
-      .map(account -> this.modelMapper.map(account, AccountModel.class))
+      .map(account -> this.modelMapper
+        .map(account, AccountModel.class)
+        .toBuilder()
+        .verified(false)
+        .build())
       .flatMap(this.repository::save)
       .onErrorMap(
         DataIntegrityViolationException.class,
@@ -36,8 +42,14 @@ public class AccountService {
     return this.repository.findByUsername(username);
   }
 
-  public Flux<AccountModel> list() {
-    return this.repository.findAll();
+  public Flux<AccountModel> list(Pageable pageable) {
+    return this.repository
+      .findAll(pageable.getSort())
+      .onErrorMap(
+        BadSqlGrammarException.class,
+        (exception) -> new IllegalArgumentException("Invalid sort parameter."))
+      .skip(pageable.getOffset())
+      .take(pageable.getPageSize());
   }
 
   public Mono<AccountModel> update(Integer id, Mono<AccountRequestModel> accountRequest) {
@@ -57,5 +69,9 @@ public class AccountService {
       .flatMap(account -> this.repository
         .deleteById(account.getId())
         .thenReturn(account));
+  }
+
+  public Mono<Boolean> exists(Integer id) {
+    return this.repository.existsById(id);
   }
 }

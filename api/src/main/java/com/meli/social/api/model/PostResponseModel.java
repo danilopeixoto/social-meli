@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
 
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -30,9 +31,9 @@ public class PostResponseModel {
   @JsonProperty("category")
   private Integer category;
 
-  @NotNull(message = "The promotion field is required.")
-  @JsonProperty("promotion")
-  private Boolean promotion;
+  @NotNull(message = "The promotional field is required.")
+  @JsonProperty("promotional")
+  private Boolean promotional;
 
   @NotNull(message = "The price field is required.")
   @Min(value = 0, message = "The price field requires a positive number.")
@@ -48,4 +49,8 @@ public class PostResponseModel {
   @NotNull(message = "The product field is required.")
   @JsonProperty("product")
   private ProductDetailResponseModel product;
+
+  @NotNull(message = "The created at field is required.")
+  @JsonProperty("created_at")
+  private Instant createdAt;
 }

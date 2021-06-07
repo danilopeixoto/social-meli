@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 @Repository
-public class FollowerRepository {
+public class FollowedRepository {
   @Autowired
   private DatabaseClient databaseClient;
 
@@ -24,7 +24,7 @@ public class FollowerRepository {
     return databaseClient
       .sql(
         "select a.* from account a " +
-          "inner join following f on f.follower_id = a.id and f.followed_id = $1 " +
+          "inner join following f on f.follower_id = $1 and f.followed_id = a.id " +
           "order by a." + sortString)
       .bind("$1", accountId)
       .fetch()

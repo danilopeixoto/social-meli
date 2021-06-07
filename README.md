@@ -2,7 +2,7 @@
 
 Mercado Libre social network.
 
-Social Meli democratizes the marketplace and users can safely advertise or buy items.
+Social Meli democratizes the marketplace and enables all users to advertise or buy products securely.
 
 ## Prerequisites
 

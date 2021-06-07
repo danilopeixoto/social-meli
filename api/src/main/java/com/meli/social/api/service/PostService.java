@@ -6,6 +6,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Pageable;
+import org.springframework.r2dbc.BadSqlGrammarException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -13,6 +15,8 @@ import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
+
+import java.util.NoSuchElementException;
 
 @Service
 public class PostService {
@@ -25,13 +29,13 @@ public class PostService {
   @Autowired
   private ProductService productService;
 
-  private Mono<Tuple2<PostModel, ProductModel>> packProduct(PostModel post) {
+  public Mono<Tuple2<PostModel, ProductModel>> packProduct(PostModel post) {
     return Mono
       .just(post)
       .zipWith(this.productService.findById(post.getProductId()));
   }
 
-  private PostResponseModel toResponse(Tuple2<PostModel, ProductModel> models) {
+  public PostResponseModel toResponse(Tuple2<PostModel, ProductModel> models) {
     return TupleUtils
       .<PostModel, ProductModel, PostResponseModel>function((post, product) -> this.modelMapper
         .map(post, PostResponseModel.class)
@@ -54,9 +58,15 @@ public class PostService {
           .build())
         .flatMap(product -> this.productService.create(Mono.just(product)))
         .map(ProductModel::getId))
-      .map(productId -> postRequest
+      .flatMap(this.productService::findById)
+      .switchIfEmpty(Mono.error(new NoSuchElementException("Product resource not found.")))
+      .filter(product -> product
+        .getAccountId()
+        .equals(postRequest.getAccountId()))
+      .switchIfEmpty(Mono.error(new IllegalAccessException("Account resource cannot access product.")))
+      .map(product -> postRequest
         .toBuilder()
-        .productId(productId)
+        .productId(product.getId())
         .build());
   }
 
@@ -68,7 +78,7 @@ public class PostService {
       .flatMap(this.repository::save)
       .onErrorMap(
         DataIntegrityViolationException.class,
-        (exception) -> new DuplicateKeyException("Account or product resource not found."))
+        (exception) -> new DuplicateKeyException("Account resource not found."))
       .flatMap(this::packProduct)
       .map(this::toResponse);
   }
@@ -80,16 +90,23 @@ public class PostService {
       .map(this::toResponse);
   }
 
-  public Flux<PostResponseModel> findByProductId(Integer productId) {
+  public Flux<PostResponseModel> findByProductId(Integer productId, Pageable pageable) {
     return this.repository
       .findByProductId(productId)
+      .skip(pageable.getOffset())
+      .take(pageable.getPageSize())
       .flatMap(this::packProduct)
       .map(this::toResponse);
   }
 
-  public Flux<PostResponseModel> list() {
+  public Flux<PostResponseModel> list(Pageable pageable) {
     return this.repository
-      .findAll()
+      .findAll(pageable.getSort())
+      .onErrorMap(
+        BadSqlGrammarException.class,
+        (exception) -> new IllegalArgumentException("Invalid sort parameter."))
+      .skip(pageable.getOffset())
+      .take(pageable.getPageSize())
       .flatMap(this::packProduct)
       .map(this::toResponse);
   }
@@ -109,7 +126,7 @@ public class PostService {
       .flatMap(this.repository::save)
       .onErrorMap(
         DataIntegrityViolationException.class,
-        (exception) -> new DuplicateKeyException("Account or product resource not found."))
+        (exception) -> new DuplicateKeyException("Account resource not found."))
       .flatMap(this::packProduct)
       .map(this::toResponse);
   }
@@ -123,5 +140,9 @@ public class PostService {
           .deleteById(post.getId())
           .thenReturn(Tuples.of(post, product))))
       .map(this::toResponse);
+  }
+
+  public Mono<Boolean> exists(Integer id) {
+    return this.repository.existsById(id);
   }
 }

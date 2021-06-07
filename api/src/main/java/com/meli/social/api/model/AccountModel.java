@@ -30,4 +30,9 @@ public class AccountModel {
   @JsonProperty("username")
   @Column("username")
   private String username;
+
+  @NotNull(message = "The verified field is required.")
+  @JsonProperty("verified")
+  @Column("verified")
+  private Boolean verified;
 }
