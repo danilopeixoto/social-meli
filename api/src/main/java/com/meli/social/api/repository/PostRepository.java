@@ -10,8 +10,8 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface PostRepository extends ReactiveSortingRepository<PostModel, Integer> {
-  @Query("select * from post where product_id = :product_id order by product_id")
-  Flux<PostModel> findByProductId(@Param("product_id") Integer productId);
+  @Query("select * from post where account_id = :account_id order by account_id")
+  Flux<PostModel> findByAccountId(@Param("account_id") Integer accountId);
 
   @Query("select count(id) from post where account_id = :account_id and promotional")
   Mono<Long> countByAccountIdAndPromotional(@Param("account_id") Integer accountId);

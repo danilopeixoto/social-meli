@@ -96,7 +96,7 @@ public class PostController {
       .switchIfEmpty(Mono.error(new NoSuchElementException("Resource not found.")));
   }
 
-  @Operation(summary = "List or find post by product ID", responses = {
+  @Operation(summary = "List or find post by account ID", responses = {
     @ApiResponse(
       responseCode = "200",
       content = @Content(
@@ -114,8 +114,8 @@ public class PostController {
         mediaType = "application/json"))
   })
   @GetMapping("/")
-  public Flux<PostResponseModel> listOrFindByProductId(
-    @Valid @RequestParam(value = "product_id", required = false) Integer productId,
+  public Flux<PostResponseModel> listOrFindByAccountId(
+    @Valid @RequestParam(value = "account_id", required = false) Integer accountId,
     @Valid @RequestParam(value = "sort", defaultValue = "id") String sort,
     @Valid @RequestParam(value = "order", defaultValue = "ASC") Sort.Direction order,
     @Valid @RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -123,9 +123,9 @@ public class PostController {
     Pageable pageable = PageRequest.of(page, size, order, sort);
 
     return Mono
-      .justOrEmpty(productId)
+      .justOrEmpty(accountId)
       .switchIfEmpty(Mono.error(new IllegalArgumentException()))
-      .flatMapMany(id -> this.service.findByProductId(id, pageable))
+      .flatMapMany(id -> this.service.findByAccountId(id, pageable))
       .onErrorResume(
         IllegalArgumentException.class,
         exception -> this.service.list(pageable));

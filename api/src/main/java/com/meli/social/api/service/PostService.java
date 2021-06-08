@@ -90,9 +90,9 @@ public class PostService {
       .map(this::toResponse);
   }
 
-  public Flux<PostResponseModel> findByProductId(Integer productId, Pageable pageable) {
+  public Flux<PostResponseModel> findByAccountId(Integer accountId, Pageable pageable) {
     return this.repository
-      .findByProductId(productId)
+      .findByAccountId(accountId)
       .skip(pageable.getOffset())
       .take(pageable.getPageSize())
       .flatMap(this::packProduct)
